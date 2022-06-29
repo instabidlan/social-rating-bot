@@ -2,7 +2,6 @@ from random import randint
 from os import environ
 from data_access_layer import *
 
-print(environ)
 db = DatabaseConnection(environ["DB_URI"])
 
 sr_table = SRDatabaseAccess(db)
