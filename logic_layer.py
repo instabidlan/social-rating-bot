@@ -37,9 +37,23 @@ def change_social_rating(user_id: int, username: str, delta: int) -> str:
     return f"Так держать! +{delta} social credits"
 
 
-def make_decision(user_id: int, username: str) -> str:
-    if randint(0, 100) >= 70:
-        _delta = randint(-200, 200)
-        if _delta != 0:
-            return change_social_rating(user_id, username, _delta)
-    return ""
+def antispam(message, data):
+    if 'sticker' in message.values.keys():
+        print('yeah sticker')
+        seq = message.values['sticker'].thumb['file_unique_id']
+    elif 'animation' in message.values.keys():
+        print('yeah gifka')
+        seq = message.values['animation'].thumb['file_unique_id']
+    else:
+        seq = message.text
+
+    if 'last_messages' not in data.keys():
+        data['last_messages'] = [seq]
+    else:
+        if data['last_messages'][-1] == seq:
+            data['last_messages'].append(seq)
+        else:
+            data['last_messages'] = [seq]
+    print(data['last_messages'])
+    return seq
+

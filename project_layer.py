@@ -1,18 +1,20 @@
+import asyncio
+
+import aiogram
 from logic_layer import *
 from os import environ
 from aiogram import executor, Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
 bot = Bot(token=environ["BOT_TOKEN"])
-dp = Dispatcher(bot)
 storage = MemoryStorage()
+dp = Dispatcher(bot, storage=storage)
 
 
-async def anti_flood(*args, **kwargs):
-    m = args[0]
-    change_social_rating(m.from_user.id, m.from_user.username, -200)
-    await m.answer("Партия не любит спамеров!!! -200 social credit")
+class LastMessage(StatesGroup):
+    last_messages = State()
 
 
 @dp.message_handler(commands=['social'])
@@ -29,10 +31,20 @@ async def social(message: types.Message):
         parse_mode="MarkdownV2")
 
 
-@dp.throttled(anti_flood, rate=3)
-@dp.message_handler()
-async def chat_msg_handler(message: types.Message):
-    pass
+@dp.message_handler(content_types=aiogram.types.ContentType.all())
+@dp.message_handler(state=LastMessage.last_messages)
+async def chat_msg_handler(message: types.Message, state):
+    async with state.proxy() as data:
+        antispam(message, data)
+
+        if len(data['last_messages']) > 2:
+            m = await message.answer('малафья с яйца, партия недовольна!!!! спамить низя!!!! -200')
+            change_social_rating(message.from_user.id, message.from_user.username, -200)
+            await message.delete()
+            await asyncio.sleep(5)
+            await m.delete()
+
+    print(storage.data)
 
 
 if __name__ == "__main__":
