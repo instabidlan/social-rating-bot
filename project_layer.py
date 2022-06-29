@@ -2,11 +2,11 @@ from logic_layer import *
 from config import TOKEN
 from aiogram import executor, Bot, Dispatcher, types, exceptions
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-
+from os import environ
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
-
+print(environ["BOT_TOKEN"])
 
 @dp.message_handler(commands=['social'])
 async def social(message: types.Message):
