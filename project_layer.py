@@ -45,7 +45,7 @@ async def chat_msg_handler(message: types.Message, state):
         AntispamLogic.antispam(message, data)
 
         if len(data['last_messages']) > 2:
-            m = await message.answer('*Малафья с яйца, партия недовольна!!!!* спамить низя!!!! -50 social credit',
+            m = await message.answer('*Малафья с яйца, партия недовольна\!\!\!\!* Cпамить низя\!\!\!\! \-50 social credit',
                                      parse_mode="MarkdownV2")
             SRLogic.change_social_rating(message.from_user.id, message.from_user.username, -50)
             await message.delete()
