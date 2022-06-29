@@ -8,8 +8,8 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
 
-@dp.message_handler(commands=['stats'])
-async def stats(message: types.Message):
+@dp.message_handler(commands=['social'])
+async def social(message: types.Message):
     await message.delete()
     output = stats_func_output(
         user_id=message.from_user.id,
