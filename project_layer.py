@@ -1,12 +1,11 @@
 from logic_layer import *
-from config import TOKEN
-from aiogram import executor, Bot, Dispatcher, types, exceptions
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from os import environ
+from aiogram import executor, Bot, Dispatcher, types
 
-bot = Bot(token=TOKEN)
+
+bot = Bot(token=environ["BOT_TOKEN"])
 dp = Dispatcher(bot)
-print(environ["BOT_TOKEN"])
+
 
 @dp.message_handler(commands=['social'])
 async def social(message: types.Message):
@@ -20,11 +19,6 @@ async def social(message: types.Message):
         text=output,
         chat_id=message.chat.id,
         parse_mode="MarkdownV2")
-
-#
-# @dp.message_handler(commands=['blacklist'])
-# async def blacklist(message: types.Message):
-#     get_blacklist_output()
 
 
 @dp.message_handler()

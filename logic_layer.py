@@ -1,17 +1,20 @@
 from random import randint
+from os import environ
 from data_access_layer import *
-from config import DB_URI
 
+print(environ)
+db = DatabaseConnection(environ["DB_URI"])
 
-db = DataBaseAccess(DB_URI)
+sr_table = SRDatabaseAccess(db)
+bl_table = BlacklistDatabaseAccess(db)
 
 
 def get_social_rating(user_id: int, username: str) -> int:
-    if not db.item_in_column(item=user_id, table="social_rating", column="id"):
-        db.insert_into(table="social_rating", values=(user_id, username, 0))
+    if not sr_table.is_in_table(item=user_id, column="id"):
+        sr_table.insert(values=(user_id, username, 0))
 
-    user_obj = db.get_user(table="social_rating", cond="id=%s", values=(user_id,))
-    _social_rating = user_obj.social_rating
+    user_obj = sr_table.get(cond="id=%s", values=(user_id,), to_get="*")
+    _social_rating = user_obj["social_rating"]
 
     return _social_rating
 
@@ -24,18 +27,11 @@ def stats_func_output(user_id: int, username: str) -> str:
               f"{party_op}"
     return out_str
 
-#
-# def get_blacklist_output():
-#     blacklist = db.get_blacklist()
-#     out_str = f"BLACKLIST FB-11:\n" \
-#               "{}"
-
 
 def change_social_rating(user_id: int, username: str, delta: int) -> str:
     _social_rating = get_social_rating(user_id, username) + delta
 
-    db.update_table_where(table="social_rating",
-                          set="social_rating=%s, username=%s",
+    sr_table.update_table(to_set="social_rating=%s, username=%s",
                           cond="id=%s", values=(_social_rating, username, user_id))
     if delta < 0:
         return f"Партия тобой недовольна! {delta} social credits"
