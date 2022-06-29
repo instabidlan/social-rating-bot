@@ -20,7 +20,7 @@ class LastMessage(StatesGroup):
 @dp.message_handler(commands=['social'])
 async def social(message: types.Message):
     await message.delete()
-    output = stats_func_output(
+    output = OutputLogic.stats_func_output(
         user_id=message.from_user.id,
         username=message.from_user.username
     )
@@ -31,15 +31,23 @@ async def social(message: types.Message):
         parse_mode="MarkdownV2")
 
 
+@dp.message_handler(commands=['blacklist'])
+async def blacklist(message: types.Message):
+    await message.delete()
+
+    await message.answer(OutputLogic.blacklist_helper(message.from_user.username), parse_mode="MarkdownV2")
+
+
 @dp.message_handler(content_types=aiogram.types.ContentType.all())
 @dp.message_handler(state=LastMessage.last_messages)
 async def chat_msg_handler(message: types.Message, state):
     async with state.proxy() as data:
-        antispam(message, data)
+        AntispamLogic.antispam(message, data)
 
         if len(data['last_messages']) > 2:
-            m = await message.answer('малафья с яйца, партия недовольна!!!! спамить низя!!!! -200')
-            change_social_rating(message.from_user.id, message.from_user.username, -200)
+            m = await message.answer('*Малафья с яйца, партия недовольна!!!!* спамить низя!!!! -50 social credit',
+                                     parse_mode="MarkdownV2")
+            SRLogic.change_social_rating(message.from_user.id, message.from_user.username, -50)
             await message.delete()
             await asyncio.sleep(5)
             await m.delete()

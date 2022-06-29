@@ -86,6 +86,13 @@ class BlacklistDatabaseAccess(DatabaseAccess):
         user_dict = self.db.fetchone()[0]
         return user_dict
 
+    def get_all(self, to_get: str) -> list[dict]:
+        query = f"SELECT to_json(result) FROM (SELECT {to_get} FROM blacklist) result"
+
+        self.db.execute(query, ())
+        blacklist_users = self.db.fetchall()
+        return blacklist_users
+
     def is_in_table(self, item, column: str) -> bool:
         self.db.execute(f"SELECT {column} FROM blacklist", ())
         return (item,) in self.db.fetchall()
