@@ -8,7 +8,7 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
 
-@dp.message_handler(command=['start'])
+@dp.message_handler(commands=['start'])
 async def start(message: types.Message):
     await message.reply("aboba")
 
